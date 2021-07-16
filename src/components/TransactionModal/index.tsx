@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
 import Modal from 'react-modal'
 import closeImg from '../../assets/close.svg'
 import income from '../../assets/income.svg'
 import outcome from '../../assets/outcome.svg'
+import { api } from '../../services/api'
 import { Container, TransactionTypeContainer, RadioBox } from './style'
 
 interface TransactionModalProps {
@@ -12,7 +13,22 @@ interface TransactionModalProps {
 
 export default function TransactionModal({ open, onModalClose }: TransactionModalProps){
     const [type, setType] = useState('')
+    const [title, setTitle] = useState('')
+    const [category, setCategory] = useState('')
+    const [value, setValue] = useState(0)
 
+    function handleCreateNewTransaction(event: FormEvent) {
+        event.preventDefault()
+
+        const data = {
+            title,
+            value,
+            category,
+            type,
+        }
+
+        api.post('/transactions', data)
+    }
 
     return(
         <Modal 
@@ -30,16 +46,20 @@ export default function TransactionModal({ open, onModalClose }: TransactionModa
                 />
             </button>
 
-            <Container>
+            <Container onSubmit={handleCreateNewTransaction} >
                 <h2>Cadastrar transação</h2>
 
                 <input 
                  placeholder="Título"
+                 value={title}
+                 onChange={(e) => setTitle(e.target.value)}
                 />
 
                 <input
                  type="number"
                  placeholder="Valor"
+                 value={value}
+                 onChange={(e) => setValue(+e.target.value)}
                 />
 
                 <TransactionTypeContainer>
@@ -47,6 +67,7 @@ export default function TransactionModal({ open, onModalClose }: TransactionModa
                      type="button"
                      onClick={() => setType('deposit')}
                      isActive={type === 'deposit'}
+                     activeColor="green"
                     >
                         <img src={income} alt="income" />
                         <span>Entrada</span>
@@ -56,6 +77,7 @@ export default function TransactionModal({ open, onModalClose }: TransactionModa
                      type="button"
                      onClick={() => setType('withdraw')}
                      isActive={type === 'withdraw'}
+                     activeColor="red"
                     >
                         <img src={outcome} alt="outcome" />
                         <span>Saída</span>
@@ -64,6 +86,8 @@ export default function TransactionModal({ open, onModalClose }: TransactionModa
 
                 <input 
                  placeholder="Categoria"
+                 value={category}
+                 onChange={(e) => setCategory(e.target.value)}
                 />
 
                 <button type="submit">

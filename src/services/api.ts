@@ -1,24 +1,40 @@
 import axios from "axios"
-import { createServer } from 'miragejs'
+import { createServer, Model } from 'miragejs'
 
 createServer({
-    routes(){
-      this.namespace = 'api'
-  
-      this.get('/transactions', () => {
-        return [
-          {
-            id: 1,
-            title: 'Transaction 1',
-            amount: 400,
-            type: 'deposit',
-            category: 'Food',
-            createAt: new Date()
-          }
-        ]
-      })
-    }
-  })
+  models: {
+    transaction: Model
+  },
+
+  seeds(server){
+    server.db.loadData({
+      transactions: [
+        {
+          id: 1,
+          title: 'Ubereats - Bubbletea',
+          type: 'withdraw',
+          category: 'Comida',
+          amount: 40,
+          createdAt: new Date('2021-02-02')
+        }
+      ]
+    })
+  },
+
+  routes(){
+    this.namespace = 'api'
+
+    this.get('/transactions', () => {
+      return this.schema.all('transaction')
+    })
+
+    this.post('/transactions', (schema, request) => {
+      const data = JSON.parse(request.requestBody)
+
+      return schema.create('transaction', data)
+    })
+  }
+})
 
 export const api = axios.create({
     baseURL: 'http://localhost:3000/api',
