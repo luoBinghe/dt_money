@@ -1,32 +1,28 @@
 import { Dashboard } from "./components/Dashboard";
 import { Header } from "./components/Header";
-import { createServer } from 'miragejs'
 import { GlobalStyle } from "./styles/global";
+import Modal from 'react-modal'
+import { useState } from "react";
+import TransactionModal from "./components/TransactionModal";
 
-createServer({
-  routes(){
-    this.namespace = 'api'
-
-    this.get('/transactions', () => {
-      return [
-        {
-          id: 1,
-          title: 'Transaction 1',
-          amount: 400,
-          type: 'deposit',
-          category: 'Food',
-          createAt: new Date()
-        }
-      ]
-    })
-  }
-})
+Modal.setAppElement('#root')
 
 function App() {
+  const [isNewTransactionModalOpen, setIsNewTransactionModalOpen] = useState(false)
+
+  function handleCloseNewModalTransaction(){
+      setIsNewTransactionModalOpen(false)
+  }
+
+  function handleOpenNewModalTransaction(){
+    setIsNewTransactionModalOpen(true)
+  }
+
   return (
     <>
-      <Header />
+      <Header onOpenModalTransaction={handleOpenNewModalTransaction} />
       <Dashboard />
+      <TransactionModal open={isNewTransactionModalOpen} onModalClose={handleCloseNewModalTransaction} />
       <GlobalStyle />
     </>
   );
